@@ -1,28 +1,31 @@
-import "dvd" -- DEMO
-local dvd = dvd(1, -1) -- DEMO
+import "CoreLibs/graphics"
 
+local pd <const> = playdate
 local gfx <const> = playdate.graphics
-local font = gfx.font.new('font/Mini Sans 2X') -- DEMO
 
-local function loadGame()
-	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
-	math.randomseed(playdate.getSecondsSinceEpoch()) -- seed for math.random
-	gfx.setFont(font) -- DEMO
-end
-
-local function updateGame()
-	dvd:update() -- DEMO
-end
-
-local function drawGame()
-	gfx.clear() -- Clears the screen
-	dvd:draw() -- DEMO
-end
-
-loadGame()
+local playerX, playerY = 200, 120
+local playerRadius = 10
+local playerSpeed = 3
 
 function playdate.update()
-	updateGame()
-	drawGame()
-	playdate.drawFPS(0,0) -- FPS widget
+	gfx.clear()
+	local crankAngle = math.rad(pd.getCrankPosition() or 0)
+	local screenX = pd.display.getWidth() or 0
+	local screenY = pd.display.getHeight() or 0
+	playerX += math.sin(crankAngle) * playerSpeed
+	playerY -= math.cos(crankAngle) * playerSpeed
+
+	if playerX >= screenX + playerRadius then
+		playerX -= screenX + playerRadius
+	elseif playerX <= -playerRadius then
+		playerX += screenX + playerRadius
+	end
+
+	if playerY >= screenY + playerRadius then
+		playerY -= screenY + playerRadius
+	elseif playerY <= -playerRadius then
+		playerY += screenY + playerRadius
+	end
+
+	gfx.fillCircleAtPoint(playerX, playerY, playerRadius)
 end
