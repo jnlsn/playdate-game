@@ -1,31 +1,35 @@
+import "CoreLibs/object"
 import "CoreLibs/graphics"
+import "CoreLibs/sprites"
+import "CoreLibs/timer"
+
+import "player"
+import "enemySpawner"
+import "scoreDisplay"
+import "screenShake"
+
+local screenShakeSprite = ScreenShake()
 
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
-local playerX, playerY = 200, 120
-local playerRadius = 10
-local playerSpeed = 3
+function resetGame()
+	resetScore()
+	clearEnemies()
+	stopSpawner()
+	startSpawner()
+	setShakeAmount(10)
+end
 
-function playdate.update()
-	gfx.clear()
-	local crankAngle = math.rad(pd.getCrankPosition() or 0)
-	local screenX = pd.display.getWidth() or 0
-	local screenY = pd.display.getHeight() or 0
-	playerX += math.sin(crankAngle) * playerSpeed
-	playerY -= math.cos(crankAngle) * playerSpeed
+function setShakeAmount(amount)
+	screenShakeSprite:setShakeAmount(amount)
+end
 
-	if playerX >= screenX + playerRadius then
-		playerX -= screenX + playerRadius
-	elseif playerX <= -playerRadius then
-		playerX += screenX + playerRadius
-	end
+createScoreDisplay()
+Player(30, 120)
+startSpawner()
 
-	if playerY >= screenY + playerRadius then
-		playerY -= screenY + playerRadius
-	elseif playerY <= -playerRadius then
-		playerY += screenY + playerRadius
-	end
-
-	gfx.fillCircleAtPoint(playerX, playerY, playerRadius)
+function pd.update()
+	gfx.sprite.update()
+	pd.timer.updateTimers()
 end
